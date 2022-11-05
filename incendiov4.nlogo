@@ -42,9 +42,9 @@ to go
     ask neighbors4 with [pcolor = green] [
 
 
-      let probability probability-of-spread
+      let probability probabilidad-de-propagacion
 
-      let probability-big-jump probability-of-big-jump
+      let probability-big-jump probabilidad-saltos
 
       ;; compute the direction from you (the green tree) to the burning tree
       ;; (NOTE: “myself” is the burning tree (the red patch) that asked you
@@ -55,38 +55,38 @@ to go
       ;; so the south wind impedes the fire spreading to you
       ;; so reduce the probability of spread
       if (direction = 0 ) [
-        set probability probability - south-wind-speed
-        set probability-big-jump probability-of-big-jump - south-wind-speed  ;;nuevo codigo
+        set probability probability - velocidad-viento-sur
+        set probability-big-jump probabilidad-saltos - velocidad-viento-sur  ;;nuevo codigo
       ]
 
       ;; the burning tree is east of you
       ;; so the west wind impedes the fire spreading to you
       ;; so reduce the probability of spread
       if (direction = 90 ) [
-        set probability probability - west-wind-speed
-      set probability-big-jump probability-of-big-jump - west-wind-speed
+        set probability probability - velocidad-viento-oeste
+      set probability-big-jump probabilidad-saltos - velocidad-viento-oeste
       ]
 
       ;; the burning tree is south of you
       ;; so the south wind aids the fire spreading to you
       ;; so increase the probability of spread
       if (direction = 180 ) [
-        set probability probability + south-wind-speed
-      set probability-big-jump probability-of-big-jump + south-wind-speed  ;;nuevo codigo
+        set probability probability + velocidad-viento-sur
+      set probability-big-jump probabilidad-saltos + velocidad-viento-sur  ;;nuevo codigo
       ]
 
       ;; the burning tree is west of you
       ;; so the west wind aids the fire spreading to you
       ;; so increase the probability of spread
       if (direction = 270 ) [
-        set probability probability + west-wind-speed
-      set probability-big-jump probability-of-big-jump + west-wind-speed  ;;nuevo codigo
+        set probability probability + velocidad-viento-oeste
+      set probability-big-jump probabilidad-saltos + velocidad-viento-oeste  ;;nuevo codigo
       ]
       if random 100 < probability-big-jump [ ;;nuevo codigo
         set pcolor red ;; to catch on fire
         ;; if big jumps is on, then sparks can fly farther
-        if big-jumps? [
-          let target patch-at (west-wind-speed / 5) (south-wind-speed / 5)
+        if saltos [
+          let target patch-at (velocidad-viento-oeste / 5) (velocidad-viento-sur / 5)
           if target != nobody and [ pcolor ] of target = green [
             ask target [
               set pcolor orange ;; to ignite the target patch
@@ -215,11 +215,11 @@ SLIDER
 150
 206
 183
-probability-of-spread
-probability-of-spread
+probabilidad-de-propagacion
+probabilidad-de-propagacion
 0
 100
-99.0
+100.0
 1
 1
 %
@@ -230,11 +230,11 @@ SLIDER
 190
 207
 223
-south-wind-speed
-south-wind-speed
+velocidad-viento-sur
+velocidad-viento-sur
 -25
 25
-17.0
+25.0
 1
 1
 NIL
@@ -245,11 +245,11 @@ SLIDER
 232
 207
 265
-west-wind-speed
-west-wind-speed
+velocidad-viento-oeste
+velocidad-viento-oeste
 -25
 25
-18.0
+25.0
 1
 1
 NIL
@@ -260,8 +260,8 @@ SWITCH
 274
 139
 307
-big-jumps?
-big-jumps?
+saltos
+saltos
 0
 1
 -1000
@@ -271,8 +271,8 @@ SLIDER
 274
 343
 307
-probability-of-big-jump
-probability-of-big-jump
+probabilidad-saltos
+probabilidad-saltos
 0
 100
 24.0
@@ -298,7 +298,7 @@ MONITOR
 448
 410
 Velocidad de propagacion (m/s)
-((( 2.48 * 10 ^ ( -12 ) )\n* (0.31) \n* ( 1 - 2.59 * ( HumedadF / 0.3 ) + 5.11 * ( HumedadF / 0.3) ^ 2 - 3.52 * ( HumedadF / 0.3 ) ^ 3 ) \n* ( CargaFuego ) \n* ( 4400 )\n* ( 0.0072 ) \n* ( 1 + ( 5.35 * ( abs south-wind-speed + abs west-wind-speed ) ^ ( 0.0622 ) * 4.52 ^ ( -0.714 ) ) ) \n)\n/\n( ( Arboles ) \n* ( 5.16 * 10 ^ ( -12) )\n* ( 250 + 1116 * HumedadF ) ))
+((( 2.48 * 10 ^ ( -15 ) )\n* (0.31) \n* ( 1 - 2.59 * ( HumedadF / 0.3 ) + 5.11 * ( HumedadF / 0.3) ^ 2 - 3.52 * ( HumedadF / 0.3 ) ^ 3 ) \n* ( CargaFuego ) \n* ( 4400 )\n* ( 0.0072 ) \n* ( 1 + ( 5.35 * ( abs velocidad-viento-sur + abs velocidad-viento-oeste ) ^ ( 0.0622 ) * 4.52 ^ ( -0.714 ) ) ) \n)\n/\n( abs ( (Arboles)/(1 - Arboles ) )\n* ( 5.16 * 10 ^ ( -12) )\n* ( 250 + 1116 * HumedadF ) ) )
 17
 1
 11
@@ -327,96 +327,13 @@ CargaFuego
 CargaFuego
 100
 10000
-1400.0
+10000.0
 100
 1
 kg/m2
 HORIZONTAL
 
 @#$#@#$#@
-## ACKNOWLEDGMENT
-
-This model is from Chapter Three of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, MA. MIT Press.
-
-This model is in the IABM Textbook folder of the NetLogo Models Library. The model, as well as any updates to the model, can also be found on the textbook website: http://www.intro-to-abm.com/.
-
-## WHAT IS IT?
-
-This project simulates the spread of a fire through a forest.  It shows that the fire's chance of reaching the right edge of the forest depends critically on the density of trees. This is an example of a common feature of complex systems, the presence of a non-linear threshold or critical parameter. This model extends the Fire Simple Extension 2 model by adding BIG-JUMPS.
-
-## HOW IT WORKS
-
-The fire starts on the left edge of the forest, and spreads to neighboring trees. The fire spreads in four directions: north, east, south, and west.
-
-Unlike the first few Fire models, this adds long distance transmission of fire, which means that fire can jump across unburnt stretches of forest.
-
-## HOW TO USE IT
-
-Click the SETUP button to set up the trees (green) and fire (red on the left-hand side).
-
-Click the GO button to start the simulation.
-
-The DENSITY slider controls the density of trees in the forest. (Note: Changes in the DENSITY slider do not take effect until the next SETUP.)
-
-The PROBABILITY-OF-SPREAD slider affects how the fire spreads from patch to patch.
-
-The SOUTH-WIND-SPEED slider affects how strong the wind is from the south.  You can set it negative to create a north wind.
-
-The WEST-WIND-SPEED slider affects how strong the wind is from the south.  You can set it negative to create a east wind.
-
-The BIG-JUMPS? switch controls whether or not sparks can jump across long distances.
-
-## THINGS TO NOTICE
-
-Compare this model to the Fire Simple Extension 2 model.  How do the sparks affect the results?
-
-Does adding spark jumping change the overall amount of forest burned? Why do you think that might be?
-
-## THINGS TO TRY
-
-Try running the same settings with BIG-JUMPS? turned off and on, how does this affect the results?
-
-## RELATED MODELS
-
-Fire Simple, Fire, Percolation, Rumor Mill
-
-## CREDITS AND REFERENCES
-
-This model is a simplified version of:
-
-* Wilensky, U. (1997).  NetLogo Fire model.  http://ccl.northwestern.edu/netlogo/models/Fire.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-## HOW TO CITE
-
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2006).  NetLogo Fire Simple Extension 3 model.  http://ccl.northwestern.edu/netlogo/models/FireSimpleExtension3.  Center for Connected Learning and Computer-Based Modeling, Northwestern Institute on Complex Systems, Northwestern University, Evanston, IL.
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the textbook as:
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, MA. MIT Press.
-
-## COPYRIGHT AND LICENSE
-
-Copyright 2006 Uri Wilensky.
-
-![CC BY-NC-SA 3.0](http://ccl.northwestern.edu/images/creativecommons/byncsa.png)
-
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.  To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
-
-Commercial licenses are also available. To inquire about commercial licenses, please contact Uri Wilensky at uri@northwestern.edu.
-
-<!-- 2006 -->
 @#$#@#$#@
 default
 true
@@ -700,7 +617,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.2
+NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
